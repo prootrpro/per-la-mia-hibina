@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buon 16° Compleanno Hibina! ❤️ Matias & Hibina</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hibina: {
+                            pink: '#ff80bf',
+                            pinkLight: '#ffe6f2',
+                            blue: '#3b82f6',
+                            blueDark: '#1e3a8a',
+                            purple: '#8b5cf6',
+                            softBg: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        cursive: ['Dancing Script', 'cursive'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Sfondo Gradiente Animato Rosa e Blu */
+        body {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #31103f, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #f8fafc;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism avanzato con sfumatura Rosa & Blu */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card-hover {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card-hover:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: rgba(255, 128, 191, 0.4);
+            box-shadow: 0 12px 40px 0 rgba(255, 128, 191, 0.25);
+        }
+
+        /* Fiamma delle Candeline */
+        .flame {
+            background: radial-gradient(ellipse at bottom, #ffee55 0%, #ff6600 60%, transparent 100%);
+            border-radius: 50% 50% 20% 20%;
+            animation: flicker 0.6s infinite alternate ease-in-out;
+            box-shadow: 0 0 12px #ff9900;
+        }
+
+        @keyframes flicker {
+            0%, 100% { transform: scale(1) rotate(-2deg); opacity: 0.9; }
+            50% { transform: scale(1.2) rotate(2deg); opacity: 1; }
+        }
+
+        /* Effetti Particelle */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUp 8s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.3) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.1) rotate(360deg); opacity: 0; }
+        }
+
+        /* Linea di volo per l'aereo/cuore tra Rovigo e Milano */
+        .flight-path {
+            stroke-dasharray: 8;
+            animation: dash 30s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -1000; }
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen overflow-x-hidden relative">
+
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+    <header class="fixed top-0 left-0 right-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto glass-card rounded-2xl px-6 py-3 flex justify-between items-center border-white/10">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-pink-500 flex items-center justify-center shadow-lg shadow-pink-500/30">
+                    <i data-lucide="heart" class="w-5 h-5 text-white fill-white animate-pulse"></i>
+                </div>
+                <div>
+                    <span class="font-cursive text-2xl font-bold bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">Matias & Hibina</span>
+                    <span class="hidden sm:inline-block text-[10px] text-pink-300/80 bg-pink-500/10 px-2 py-0.5 rounded-full border border-pink-500/20 ml-2">Dal 2 Settembre ❤️️</span>
+                </div>
+            </div>
+
+            <!-- Pulsante Riproduttore Musica di Sottofondo -->
+            <button id="music-btn" onclick="toggleAudio()" class="flex items-center gap-2 bg-gradient-to-r from-pink-500/20 to-blue-500/20 border border-pink-500/30 hover:border-pink-400 text-pink-200 text-xs px-4 py-2 rounded-full transition shadow-sm">
+                <i id="music-icon" data-lucide="music" class="w-4 h-4 text-pink-400"></i>
+                <span id="music-text">Musica: On / Off</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Audio Element per la musica di sottofondo (Brano romantico rilassante) -->
+    <audio id="bg-music" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-romantic-sunset-688.mp3" type="audio/mpeg">
+    </audio>
+
+    <main class="relative z-10 pt-24 pb-16 px-4 max-w-5xl mx-auto space-y-20">
+
+        <section id="hero" class="text-center pt-8 pb-4 relative">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-pink-500/20 to-blue-500/20 border border-pink-400/30 text-pink-300 text-sm font-medium mb-6 shadow-lg shadow-pink-500/10 animate-bounce">
+                <i data-lucide="sparkles" class="w-4 h-4 text-pink-400"></i>
+                <span>Il Tuo Giorno Speciale - 7 Ottobre</span>
+                <i data-lucide="sparkles" class="w-4 h-4 text-blue-400"></i>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-4">
+                Buon 16° Compleanno <br>
+                <span class="font-cursive text-6xl md:text-8xl bg-gradient-to-r from-pink-400 via-purple-300 to-blue-400 bg-clip-text text-transparent font-normal">Mia Dolce Hibina</span> ❤️
+            </h1>
+
+            <p class="text-slate-300 text-base md:text-lg max-w-2xl mx-auto font-light leading-relaxed mb-8">
+                spero ti piaccia questo sito che ho fatto per te da <strong class="text-pink-300">Matias</strong>. 
+               
+            </p>
+
+            <!-- Countdown Timer Container -->
+            <div class="glass-card p-6 rounded-3xl max-w-2xl mx-auto border-pink-500/20 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-pink-500/10 rounded-full blur-2xl"></div>
+                <div class="absolute -left-10 -top-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
+
+                <p id="countdown-status" class="text-xs uppercase tracking-widest text-pink-300 font-semibold mb-4">
+                    🎉 Countdown per il 7 Ottobre 🎉
+                </p>
+
+                <div class="grid grid-cols-4 gap-3 md:gap-6">
+                    <div class="bg-slate-900/60 p-3 md:p-4 rounded-2xl border border-white/10">
+                        <span id="cd-days" class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-pink-300 to-pink-500 block">00</span>
+                        <span class="text-[10px] md:text-xs text-slate-400 uppercase font-medium">Giorni</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-3 md:p-4 rounded-2xl border border-white/10">
+                        <span id="cd-hours" class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-pink-300 to-pink-500 block">00</span>
+                        <span class="text-[10px] md:text-xs text-slate-400 uppercase font-medium">Ore</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-3 md:p-4 rounded-2xl border border-white/10">
+                        <span id="cd-minutes" class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-500 block">00</span>
+                        <span class="text-[10px] md:text-xs text-slate-400 uppercase font-medium">Minuti</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-3 md:p-4 rounded-2xl border border-white/10">
+                        <span id="cd-seconds" class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-500 block">00</span>
+                        <span class="text-[10px] md:text-xs text-slate-400 uppercase font-medium">Secondi</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+ Milano)... -->
+        <section id="map-section" class="space-y-6">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold bg-gradient-to-r from-pink-300 to-blue-300 bg-clip-text text-transparent">Da Rovigo a Milano</h2>
+                <p class="text-slate-400 text-sm mt-1">Nessun chilometro potrà mai scalfire quello che proviamo</p>
+            </div>
+
+            <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+                    
+                    <!-- Rovigo - Matias -->
+                    <div class="flex flex-col items-center text-center space-y-2">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 border border-blue-400/40">
+                            <i data-lucide="map-pin" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white">Rovigo</h3>
+                            <span class="text-xs text-blue-300 bg-blue-500/20 px-3 py-1 rounded-full border border-blue-500/30">Matias 💙</span>
+                        </div>
+                    </div>
+
+                    <!-- Linea di Connessione con Aereo/Cuore -->
+                    <div class="flex-1 w-full flex flex-col items-center px-4">
+                        <div class="w-full relative flex items-center justify-center my-4">
+                            <div class="w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-40"></div>
+                            <div class="absolute bg-slate-900 border border-pink-400/50 p-2.5 rounded-full shadow-lg shadow-pink-500/40 text-pink-400 animate-pulse">
+                                <i data-lucide="plane" class="w-5 h-5 transform rotate-45"></i>
+                            </div>
+                        </div>
+                        <span class="text-xs font-semibold text-pink-300/90 bg-pink-500/10 px-4 py-1 rounded-full border border-pink-500/20">
+                            ti amo tantissimo vita mia, sei sempre nel mio cuore
+                        </span>
+                    </div>
+
+                    <!-- Milano - Hibina -->
+                    <div class="flex flex-col items-center text-center space-y-2">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-pink-500/30 border border-pink-400/40">
+                            <i data-lucide="heart" class="w-8 h-8 fill-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white">Milano</h3>
+                            <span class="text-xs text-pink-300 bg-pink-500/20 px-3 py-1 rounded-full border border-pink-500/30">Hibina 💕</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Messaggio di Guarigione -->
+                <div class="mt-8 pt-6 border-t border-white/10 text-center">
+                    <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-400/20 text-blue-300 px-4 py-2 rounded-xl text-xs md:text-sm">
+                        <i data-lucide="thermometer-snowflake" class="w-4 h-4 text-blue-400"></i>
+                        <span>quanto vorrei essere insieme a te a farti stare meglio</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cake-section" class="text-center space-y-6">
+            <div>
+                <h2 class="text-3xl font-bold bg-gradient-to-r from-pink-300 to-purple-300 bg-clip-text text-transparent">I Tuoi 16 Anni! 🎂</h2>
+                <p class="text-slate-400 text-sm mt-1">Esprimi un desiderio speciale e soffia sulle tue candeline!</p>
+            </div>
+
+            <div class="glass-card p-10 rounded-3xl relative overflow-hidden flex flex-col items-center">
+                
+                <!-- Torta Animata -->
+                <div class="relative cursor-pointer my-6 group" onclick="blowOutCandles()">
+                    
+                    <!-- Fiamme delle Candeline (16 Candeline simulate in fila) -->
+                    <div id="flames-container" class="flex justify-center space-x-1 md:space-x-1.5 absolute -top-6 left-0 right-0 z-20 px-4">
+                        <!-- Generati via JavaScript 16 fiamme -->
+                    </div>
+
+                    <!-- Corpo Candeline -->
+                    <div id="candles-container" class="flex justify-center space-x-1 md:space-x-1.5 relative z-10 mb-1 px-4">
+                        <!-- Generati via JavaScript 16 steli -->
+                    </div>
+
+                    <!-- Strati Torta -->
+                    <div class="w-56 md:w-72 h-12 bg-gradient-to-r from-pink-400 to-pink-500 rounded-t-2xl border-b-4 border-pink-600 flex items-center justify-center text-white text-xs font-bold shadow-inner">
+                        💗 H I B I N A 💗
+                    </div>
+                    <div class="w-64 md:w-80 h-14 bg-gradient-to-r from-purple-400 to-pink-400 rounded-t-xl border-b-4 border-purple-500 flex items-center justify-center text-white text-xs font-bold tracking-widest shadow-inner">
+                        16 ANNI INSIEME
+                    </div>
+                    <div class="w-72 md:w-96 h-16 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 rounded-b-3xl border-t-2 border-white/20 flex items-center justify-center text-white text-sm font-bold shadow-xl">
+                        7 OTTOBRE 
+                    </div>
+                </div>
+
+                <button id="blow-btn" onclick="blowOutCandles()" class="mt-4 bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white font-semibold px-8 py-3.5 rounded-full shadow-lg shadow-pink-500/30 hover:scale-105 transition duration-300 flex items-center gap-2">
+                    <i data-lucide="wind" class="w-5 h-5"></i>
+                    <span>Clicca qui per soffiare le 16 candeline!</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="why-i-love-you" class="space-y-6">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold bg-gradient-to-r from-pink-300 to-blue-300 bg-clip-text text-transparent">Cosa Amo Incondizionatamente di Te</h2>
+                <p class="text-slate-400 text-sm mt-1">I piccoli e grandi motivi per cui mi fai impazzire da morire</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="glass-card p-6 rounded-3xl glass-card-hover border-pink-500/20">
+                    <div class="w-12 h-12 rounded-2xl bg-pink-500/20 text-pink-300 flex items-center justify-center mb-4 border border-pink-500/30">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-white mb-2">I Tuoi Occhi e il Tuo Sorriso</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        Hai gli occhi più belli che io abbia mai visto e un sorriso capace di illuminare anche la mia giornata più noiosa o difficile.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-card p-6 rounded-3xl glass-card-hover border-blue-500/20">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-300 flex items-center justify-center mb-4 border border-blue-500/30">
+                        <i data-lucide="video" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-white mb-2">Le Nostre Videochiamate</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        Prima di te odiavo fare videochiamate. Ora con te è diventata la cosa più bella della mia giornata. Addormentarci insieme in chiamata è la cosa più bella che potessi fare con te.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-card p-6 rounded-3xl glass-card-hover border-purple-500/20">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center mb-4 border border-purple-500/30">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-white mb-2">Come Mi Fai Sentire</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        Mi fai sentire accettato, amato e compreso davvero per come sono. Soltanto tu riesci a trasmettermi questa tranquillità e questa sensazione di essere al sicuro.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="coupons-section" class="space-y-6">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">Coupon d'Amore da Riscattare</h2>
+                <p class="text-slate-400 text-sm mt-1">Validi per il nostro primissimo e desideratissimo incontro dal vivo!</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Coupon 1 -->
+                <div class="glass-card p-6 rounded-3xl border-2 border-dashed border-pink-400/40 text-center flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="w-12 h-12 rounded-full bg-pink-500/20 text-pink-300 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-base">Abbracci Infiniti</h3>
+                        <p class="text-slate-400 text-xs mt-2">Un abbraccio lunghissimo che recupererà tutti i giorni di distanza.</p>
+                    </div>
+                    <button onclick="redeemCoupon(this, 'Abbracci Infiniti')" class="w-full bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/40 text-xs font-semibold py-2.5 rounded-xl transition">
+                        Riscatta Ora ✨
+                    </button>
+                </div>
+
+                <!-- Coupon 2 -->
+                <div class="glass-card p-6 rounded-3xl border-2 border-dashed border-blue-400/40 text-center flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="w-12 h-12 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="fish" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-base">uscita al Sushi</h3>
+                        <p class="text-slate-400 text-xs mt-2">Cena al sushi insieme dove mangiamo tutto quello che vogliamo, E condividendo</p>
+                    </div>
+                    <button onclick="redeemCoupon(this, 'uscita al Sushi')" class="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/40 text-xs font-semibold py-2.5 rounded-xl transition">
+                        Riscatta Ora ✨
+                    </button>
+                </div>
+
+                <!-- Coupon 3 -->
+                <div class="glass-card p-6 rounded-3xl border-2 border-dashed border-purple-400/40 text-center flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="w-12 h-12 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="smile" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-base">Tantissimi Bacini</h3>
+                        <p class="text-slate-400 text-xs mt-2">Valido per dare tantissimi bacini ovunque.</p>
+                    </div>
+                    <button onclick="redeemCoupon(this, 'Tantissimi Bacini')" class="w-full bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-semibold py-2.5 rounded-xl transition">
+                        Riscatta Ora ✨
+                    </button>
+                </div>
+
+                <!-- Coupon 4 -->
+                <div class="glass-card p-6 rounded-3xl border-2 border-dashed border-pink-400/40 text-center flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="w-12 h-12 rounded-full bg-pink-500/20 text-pink-300 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="mic" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-base">sigarettina insieme e cantiamo anche!!</h3>
+                        <p class="text-slate-400 text-xs mt-2">cantiamo le nostre canzoni preferite e fumiamo!!!</p>
+                    </div>
+                    <button onclick="redeemCoupon(this, 'sigarettina insieme e cantiamo anche!!')" class="w-full bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/40 text-xs font-semibold py-2.5 rounded-xl transition">
+                        Riscatta Ora ✨
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="memory-letter" class="space-y-6">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">come ci siamo conosciuti</h2>
+                <p class="text-slate-400 text-sm mt-1">come abbiamo costruito la nostra relazione</p>
+            </div>
+
+            <div class="glass-card p-8 md:p-10 rounded-3xl border-pink-500/30 space-y-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="space-y-6 text-slate-200 text-sm md:text-base leading-relaxed">
+                    
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                        <div class="flex items-center gap-2 text-pink-300 font-bold">
+                            <i data-lucide="message-square-heart" class="w-5 h-5"></i>
+                            <span>I tempi di Discord e La Prima Videochiamata</span>
+                        </div>
+                        <p class="text-slate-300 text-sm">
+                            Mi ricordo ancora quando litigavamo nel server discord, "basta minacciarmi in privato" HAHAAHAHAHHAHAHA. Chi l'avrebbe mai detto che da quelle frasi totalmente random sarebbe nata la relazione più bella della mia vita? E poi è arrivato il momento della prima sera in videochiamata... avevo tanta paura, ma poi hai fatto sentire a mio agio ed ero felicissimo, grazie mille.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                        <div class="flex items-center gap-2 text-blue-300 font-bold">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
+                            <span>Quando ci fissiamo e La tua voce</span>
+                        </div>
+                        <p class="text-slate-300 text-sm">
+                            Amo quei momenti in cui ci fissiamo negli occhi in videochiamata in silenzio e sorridiamo senza bisogno di dire nulla. Amo da impazzire la tua voce quando mi racconti la tua giornata, i video e i TikTok che ci scambiamo continuamente e quando ci diciamo <em>"Io ti amo di più"</em> (anche se vinco io.)
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-gradient-to-r from-pink-500/20 to-blue-500/20 border border-pink-400/30 space-y-2 text-center py-6">
+                        <span class="font-cursive text-3xl text-pink-300 block">Hibina mia,</span>
+                        <p class="text-slate-200 font-medium text-base md:text-lg italic">
+                            "Spero davvero che questo regalo ti piaccia, anche se per ora è a distanza. Non vedo l'ora che arrivi il giorno in cui potrò darti tutti questi abbracci e baci dal vivo. Buon 16° compleanno principessa!"
+                        </p>
+                        <span class="text-pink-300 font-bold block pt-2 text-sm">— Il tuo Matias ❤️</span>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-8 text-center text-xs text-slate-500 relative z-10 border-t border-white/10">
+        <p>Creato con tutto il cuore da Matias per il 16° compleanno di Hibina ❤️ 7 Ottobre</p>
+    </footer>
+
+    <div id="wish-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full p-8 rounded-3xl text-center border-pink-400/40 relative shadow-2xl animate-bounce-short">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 to-blue-500 flex items-center justify-center mx-auto mb-4 text-white shadow-lg shadow-pink-500/50">
+                <i data-lucide="party-popper" class="w-8 h-8"></i>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-white mb-2 font-cursive">Candeline Spente! 🎉</h3>
+            
+            <div class="my-6 p-6 rounded-2xl bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 border border-pink-400/30">
+                <p id="modal-wish-text" class="text-pink-200 text-lg font-bold italic leading-relaxed">
+                    "ti amo tantissimo hiba, spero apprezzi questo regalo anche se è a distanza"
+                </p>
+            </div>
+
+            <button onclick="closeWishModal()" class="bg-gradient-to-r from-pink-500 to-blue-500 text-white font-semibold text-xs px-8 py-3 rounded-full hover:scale-105 transition shadow-lg">
+                Chiudi e Festeggia ❤️
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Inizializza Lucide Icons
+        lucide.createIcons();
+
+        /* 1. Generazione 16 Candeline sulla Torta */
+        function createCandles() {
+            const flamesContainer = document.getElementById('flames-container');
+            const candlesContainer = document.getElementById('candles-container');
+            
+            flamesContainer.innerHTML = '';
+            candlesContainer.innerHTML = '';
+
+            for (let i = 0; i < 16; i++) {
+                // Fiamma
+                const flame = document.createElement('div');
+                flame.className = 'w-2 md:w-2.5 h-4 md:h-5 flame candle-flame';
+                flamesContainer.appendChild(flame);
+
+                // Candela
+                const candle = document.createElement('div');
+                const colors = ['bg-pink-300', 'bg-blue-300', 'bg-purple-300', 'bg-indigo-300'];
+                candle.className = `w-2 md:w-2.5 h-7 md:h-9 ${colors[i % colors.length]} rounded-t-sm shadow`;
+                candlesContainer.appendChild(candle);
+            }
+        }
+        createCandles();
+
+        /* 2. Spegnere Candeline + Effetto Coriandoli */
+        let candlesBlown = false;
+        function blowOutCandles() {
+            if (candlesBlown) {
+                document.getElementById('wish-modal').classList.remove('hidden');
+                return;
+            }
+
+            const flames = document.querySelectorAll('.candle-flame');
+            flames.forEach(flame => {
+                flame.style.opacity = '0';
+                flame.style.transform = 'scale(0)';
+            });
+
+            candlesBlown = true;
+            document.getElementById('wish-modal').classList.remove('hidden');
+
+            // Lancio di coriandoli blu e rosa
+            const count = 250;
+            const defaults = { origin: { y: 0.7 } };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio),
+                    colors: ['#ff80bf', '#3b82f6', '#8b5cf6', '#ffffff']
+                }));
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+        }
+
+        function closeWishModal() {
+            document.getElementById('wish-modal').classList.add('hidden');
+        }
+
+        /* 3. Countdown al 7 Ottobre */
+        function runCountdown() {
+            const now = new Date();
+            let currentYear = now.getFullYear();
+            
+            // Imposta la data al 7 Ottobre
+            let birthday = new Date(currentYear, 9, 7, 0, 0, 0); // Mese 9 = Ottobre (0-indexed)
+
+            // Se il compleanno di quest'anno è già passato, calcola per l'anno prossimo
+            if (now.getTime() > birthday.getTime() + (24 * 60 * 60 * 1000)) {
+                birthday = new Date(currentYear + 1, 9, 7, 0, 0, 0);
+            }
+
+            const diff = birthday.getTime() - now.getTime();
+
+            if (diff <= 0 && diff > -86400000) {
+                document.getElementById('countdown-status').innerText = "🎉 OGGI È IL TUO COMPLEANNO! TANTI AUGURI HIBINA! 🎉";
+                document.getElementById('cd-days').innerText = "00";
+                document.getElementById('cd-hours').innerText = "00";
+                document.getElementById('cd-minutes').innerText = "00";
+                document.getElementById('cd-seconds').innerText = "00";
+            } else {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('cd-days').innerText = String(days).padStart(2, '0');
+                document.getElementById('cd-hours').innerText = String(hours).padStart(2, '0');
+                document.getElementById('cd-minutes').innerText = String(minutes).padStart(2, '0');
+                document.getElementById('cd-seconds').innerText = String(seconds).padStart(2, '0');
+            }
+        }
+        setInterval(runCountdown, 1000);
+        runCountdown();
+
+        /* 4. Riscatta Coupon d'Amore */
+        function redeemCoupon(btn, title) {
+            btn.disabled = true;
+            btn.classList.remove('bg-pink-500/20', 'bg-blue-500/20', 'bg-purple-500/20');
+            btn.classList.add('bg-green-500/30', 'text-green-300', 'border-green-400/40');
+            btn.innerHTML = `<i data-lucide="check" class="w-4 h-4 inline mr-1"></i> Riscattato! Mandami uno screen! ❤️`;
+            lucide.createIcons();
+            confetti({ particleCount: 40, spread: 50, origin: { y: 0.8 } });
+        }
+
+        /* 5. Audio Player Toggle */
+        let isPlaying = false;
+        function toggleAudio() {
+            const audio = document.getElementById('bg-music');
+            const btnText = document.getElementById('music-text');
+            
+            if (isPlaying) {
+                audio.pause();
+                btnText.innerText = "Musica: Off";
+            } else {
+                audio.play().then(() => {
+                    btnText.innerText = "Musica: On 🎵";
+                }).catch(() => {
+                    btnText.innerText = "Clicca ancora";
+                });
+            }
+            isPlaying = !isPlaying;
+        }
+
+        /* 6. Generatore di particelle fluttuanti (Cuori e Stelle) */
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const items = ['💖', '💙', '✨', '🌸', '❄️'];
+            
+            for (let i = 0; i < 25; i++) {
+                const el = document.createElement('div');
+                el.className = 'particle';
+                el.innerText = items[Math.floor(Math.random() * items.length)];
+                el.style.left = `${Math.random() * 100}vw`;
+                el.style.animationDuration = `${6 + Math.random() * 6}s`;
+                el.style.animationDelay = `${Math.random() * 5}s`;
+                el.style.fontSize = `${12 + Math.random() * 16}px`;
+                container.appendChild(el);
+            }
+        }
+        createParticles();
+    </script>
+</body>
+</html>
